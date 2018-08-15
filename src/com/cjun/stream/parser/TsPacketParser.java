@@ -21,36 +21,48 @@ public class TsPacketParser {
 		firstPacketPos = 0;
 	}
 
-	public void start()  {
-		try {
-			while (this.source.read() != TsPacketHeader.SYNC_BYTE)
-				firstPacketPos++;
-			this.source.reset();
-			this.source.skip(firstPacketPos);
-			int abyte;
-			int pos = 0;
-			while ((abyte = this.source.read()) != -1) {
-				if (abyte == TsPacketHeader.SYNC_BYTE) {
-					if (buf[0] == TsPacketHeader.SYNC_BYTE) {
-						queue.offer(new TsPacket(buf),30, TimeUnit.SECONDS);
+	public void start() {
+		new Thread() {
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				try {
+					TsPacketParser.this.source.mark(0);
+					int temp;
+					while ((temp = TsPacketParser.this.source.read()) != TsPacketHeader.SYNC_BYTE) {
+						System.out.println(temp);
+						firstPacketPos++;
 					}
-					buf = new byte[204];
-					pos = 0;
+					TsPacketParser.this.source.reset();
+					TsPacketParser.this.source.skip(firstPacketPos);
+					int aByte;
+					int pos = 0;
+					while ((aByte = TsPacketParser.this.source.read()) != -1) {
+						if (aByte == TsPacketHeader.SYNC_BYTE && (pos >= 188 || pos == 0)) {
+							if (buf != null && buf[0] == TsPacketHeader.SYNC_BYTE) {
+								queue.offer(new TsPacket(buf, pos), 30, TimeUnit.SECONDS);
+							}
+							buf = new byte[204];
+							pos = 0;
+						}
+						if (pos >= buf.length)
+							return;
+						buf[pos++] = (byte) (aByte & 0xff);
+					}
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
-				if (pos >= buf.length)
-					return;
-				buf[pos++] = (byte) abyte;
 			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+
+		}.start();
+
 	}
-	
-	public TsPacket getTsPacket() throws InterruptedException{
+
+	public TsPacket getTsPacket() throws InterruptedException {
 		return queue.poll(30, TimeUnit.SECONDS);
 	}
 }

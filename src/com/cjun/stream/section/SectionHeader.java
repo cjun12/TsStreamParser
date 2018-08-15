@@ -1,4 +1,4 @@
-package section;
+package com.cjun.stream.section;
 
 public class SectionHeader {
 	private int table_id;
@@ -12,19 +12,19 @@ public class SectionHeader {
 	private int current_next_indicator;
 	private int section_number;
 	private int last_section_number;
-	
+
 	public SectionHeader(byte[] data) {
 		this.table_id = data[0];
-		this.section_syntax_indicator = data[1] >> 7;
+		this.section_syntax_indicator = data[1] >> 7 & 0x01;
 		this.zero = data[1] >> 6 & 0x01;
 		this.firstReserved = data[1] >> 4 & 0x03;
-		this.section_length = (data[1] << 8 | data[2]) & 0x0fff;
-		this.transport_stream_id = data[3] << 8 | data[4];
-		this.secondReserved = data[5] >> 6;
+		this.section_length = (data[1] << 8 | data[2] & 0xff) & 0x0fff;
+		this.transport_stream_id = data[3] << 8 | data[4] & 0xff;
+		this.secondReserved = data[5] >> 6 & 0x03;
 		this.version_number = data[5] >> 1 & 0x1f;
 		this.current_next_indicator = data[5] & 0x01;
-		this.section_number = data[6];
-		this.last_section_number = data[7];
+		this.section_number = data[6] & 0xff;
+		this.last_section_number = data[7] & 0xff;
 	}
 
 	public int getTable_id() {
@@ -70,5 +70,5 @@ public class SectionHeader {
 	public int getLast_section_number() {
 		return last_section_number;
 	}
-	
+
 }

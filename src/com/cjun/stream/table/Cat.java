@@ -1,5 +1,7 @@
 package com.cjun.stream.table;
 
-public class Cat {
+import com.cjun.stream.section.Section;
 
+public class Cat  {
+	
 }

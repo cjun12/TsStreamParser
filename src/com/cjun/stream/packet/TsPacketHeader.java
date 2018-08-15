@@ -19,16 +19,19 @@ public class TsPacketHeader {
 	 * 0 7 8 9 10 23 25 27 31 |------|--|--|--|------------|------|-----|-----|
 	 */
 
+	/*
+	 * << >> & ^ |
+	 */
 	public TsPacketHeader(byte[] headerBytes) {
 		// TODO Auto-generated constructor stub
 		if (headerBytes.length < HEADER_LENGTH)
 			throw new IllegalArgumentException("The header of TS packet has 4 bytes");
 		this.sync_byte = headerBytes[0];
-		this.transport_error_indicator = headerBytes[1] >> 7;
+		this.transport_error_indicator = headerBytes[1] >> 7 & 0x01;
 		this.payload_unit_start_indicator = headerBytes[1] >> 6 & 0x01;
 		this.transport_priority = headerBytes[1] >> 5 & 0x01;
-		this.pid = (headerBytes[1] << 8 | headerBytes[2]) & 0x1fff;
-		this.transport_scrambling_control = headerBytes[3] >> 6;
+		this.pid = (headerBytes[1] << 8 | headerBytes[2]&0xff) & 0x1fff;
+		this.transport_scrambling_control = headerBytes[3] >> 6 &0x03;
 		this.adaptation_field_control = headerBytes[3] >> 4 & 0x03;
 		this.continuity_counter = headerBytes[3] & 0x0f;
 	}
@@ -78,4 +81,15 @@ public class TsPacketHeader {
 	public int getContinuity_counter() {
 		return continuity_counter;
 	}
+
+	@Override
+	public String toString() {
+		return "TsPacketHeader [sync_byte=" + sync_byte + ", transport_error_indicator=" + transport_error_indicator
+				+ ", payload_unit_start_indicator=" + payload_unit_start_indicator + ", transport_priority="
+				+ transport_priority + ", pid=" + pid + ", transport_scrambling_control=" + transport_scrambling_control
+				+ ", adaptation_field_control=" + adaptation_field_control + ", continuity_counter="
+				+ continuity_counter + "]";
+	}
+	
+
 }

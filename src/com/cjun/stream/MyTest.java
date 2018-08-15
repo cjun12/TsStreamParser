@@ -8,7 +8,9 @@ import java.util.Arrays;
 
 public class MyTest {
 	public static void main(String[] args) {
-		int[] d = new int[222];
-		System.out.println(d.length);
+		byte[] headerBytes = {0x11,(byte) 0xa9};
+		int ret =(headerBytes[0] << 8 | headerBytes[1]) & 0x1fff;
+		System.out.println(headerBytes[0] << 8);
+		System.out.println(headerBytes[1]&0xff);
 	}
 }
