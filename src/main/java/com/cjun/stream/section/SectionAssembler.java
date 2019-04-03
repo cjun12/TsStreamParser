@@ -14,7 +14,7 @@ public class SectionAssembler {
 	private ByteArrayOutputStream out;
 	private int length;
 	private int sumBytes;
-	private List<AbstractTable> tables = new ArrayList<>();
+	private List<AbstractTable> tables = new ArrayList<AbstractTable>();
 
 	public void accept(TsPacket packet) {
 		try {
